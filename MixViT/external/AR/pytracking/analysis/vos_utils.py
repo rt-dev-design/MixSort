@@ -12,7 +12,7 @@ def text_bargraph(values):
     values = np.array(values)
     nans = np.isnan(values)
     values[nans] = 0  # '░'
-    indices = ((values + hstep) * nsteps + 1).astype(np.int)
+    indices = ((values + hstep) * nsteps + 1).astype(np.int64)
     indices[values < 0] = 0
     indices[values > 1] = len(blocks)-1
     graph = blocks[indices]
@@ -46,7 +46,7 @@ def davis_jaccard_measure(fg_mask, gt_mask):
         return 1
     else:
         return np.sum((gt_mask & fg_mask)) / \
-               np.sum((gt_mask | fg_mask), dtype=np.float32)
+               np.sum((gt_mask | fg_mask), dtype=np.float64)
 
 
 def davis_jaccard_measure_torch(fg_mask, gt_mask):

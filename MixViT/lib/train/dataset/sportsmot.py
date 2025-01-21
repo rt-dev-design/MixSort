@@ -52,7 +52,7 @@ class SportsMOT(BaseVideoDataset):
     def _read_bb_anno(self, seq_id):
         seq_name = self.sequence_list[seq_id]
         bb_anno_file = os.path.join(self.annotations,self.split,seq_name+'.txt')
-        gt = pandas.read_csv(bb_anno_file, delimiter=',', header=None, dtype=np.float32, na_filter=False,
+        gt = pandas.read_csv(bb_anno_file, delimiter=',', header=None, dtype=np.float64, na_filter=False,
                              low_memory=False).values
         return torch.tensor(gt)
 

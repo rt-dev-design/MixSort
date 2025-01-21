@@ -79,7 +79,7 @@ class ARcm_seg(object):
         output (1,1,3,H,W)
         '''
         norm_img = ((img_arr/255.0) - self.mean)/(self.std)
-        img_f32 = norm_img.astype(np.float32)
+        img_f32 = norm_img.astype(np.float64)
         img_tensor = torch.from_numpy(img_f32).cuda()
         img_tensor = img_tensor.permute((2,0,1))
         return img_tensor.unsqueeze(dim=0).unsqueeze(dim=0)
@@ -89,12 +89,12 @@ class ARcm_seg(object):
         :param gt: ndarray (4,)
         :return: torch tensor (4,)
         '''
-        return torch.from_numpy(gt_arr.astype(np.float32))
+        return torch.from_numpy(gt_arr.astype(np.float64))
 
 
 def add_frame_mask(frame, mask, threshold=0.5):
     mask_new = (mask>threshold)*255 #(H,W)
-    frame_new = frame.copy().astype(np.float)
+    frame_new = frame.copy().astype(np.float64)
     frame_new[...,1] += 0.3*mask_new
     frame_new = frame_new.clip(0,255).astype(np.uint8)
     return frame_new

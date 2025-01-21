@@ -53,7 +53,7 @@ class MixFormer:
             Union[Tuple[torch.Tensor,torch.Tensor],torch.Tensor]: transfromed image (and boxes)
         """
         # compute params
-        center = torch.from_numpy(center[:4].astype(np.int))
+        center = torch.from_numpy(center[:4].astype(np.int64))
         search_area_factor = self.settings.search_area_factor[s]
         output_sz = self.settings.output_sz[s]
         x, y, w, h = [int(i) for i in center]
@@ -82,8 +82,8 @@ class MixFormer:
 
     def compute_vit_sim(self,detections,trackers,img,templates)-> np.ndarray:
         # x1,y1,w,h
-        dets=np.concatenate((detections[:,0:2],detections[:,2:4]-detections[:,0:2]),axis=1).astype(np.int32)
-        stracks=np.concatenate((trackers[:,0:2],trackers[:,2:4]-trackers[:,0:2]),axis=1).astype(np.int32)
+        dets=np.concatenate((detections[:,0:2],detections[:,2:4]-detections[:,0:2]),axis=1).astype(np.int64)
+        stracks=np.concatenate((trackers[:,0:2],trackers[:,2:4]-trackers[:,0:2]),axis=1).astype(np.int64)
         vit=np.zeros((len(stracks),len(dets)),dtype=np.float64)
         if min(vit.shape) ==0:
             return vit

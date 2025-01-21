@@ -140,3 +140,7 @@ docs/api
 events.out.tfevents*
 pretrained
 YOLOX_outputs
+
+tmp/
+tmp.py
+.vscode/

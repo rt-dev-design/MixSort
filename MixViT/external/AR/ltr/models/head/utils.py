@@ -13,7 +13,7 @@ def text_bargraph(values):
     values = np.array(values)
     nans = np.isnan(values)
     values[nans] = 0  # '░'
-    indices = ((values + hstep) * nsteps + 1).astype(np.int)
+    indices = ((values + hstep) * nsteps + 1).astype(np.int64)
     indices[values < 0] = 0
     indices[values > 1] = len(blocks) - 1
     graph = blocks[indices]

@@ -104,7 +104,7 @@ class TNL2k(BaseVideoDataset):
 
     def _read_bb_anno(self, seq_path):
         bb_anno_file = os.path.join(seq_path, "groundtruth.txt")
-        gt = pandas.read_csv(bb_anno_file, delimiter=',', header=None, dtype=np.float32, na_filter=False, low_memory=False).values
+        gt = pandas.read_csv(bb_anno_file, delimiter=',', header=None, dtype=np.float64, na_filter=False, low_memory=False).values
         return torch.tensor(gt)
 
     # def _read_target_visible(self, seq_path):

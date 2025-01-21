@@ -352,10 +352,10 @@ def draw_umich_gaussian(heatmap, center, radius, k=1):
     return heatmap
 
 def generate_gaussian(gt_box,feat_size,img_size):
-    heatmap = np.zeros((feat_size, feat_size), dtype=np.float32)
+    heatmap = np.zeros((feat_size, feat_size), dtype=np.float64)
     gt_box = gt_box * img_size / (img_size / feat_size)
     w,h = gt_box[2], gt_box[3]
     radius = gaussian_radius((math.ceil(h), math.ceil(w)))
     radius = max(0,int(radius))
-    center = np.array([gt_box[0] + w/2, gt_box[1] + h/2],dtype=np.float32).astype(np.int32)
+    center = np.array([gt_box[0] + w/2, gt_box[1] + h/2],dtype=np.float64).astype(np.int64)
     return torch.tensor(draw_umich_gaussian(heatmap, center, radius)).unsqueeze(0)

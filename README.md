@@ -256,3 +256,7 @@ We have also provided a python method in `TrackEval/scripts/eval_mot.py` to help
 ## Acknowledgement
 
 The code is mainly based on [ByteTrack](https://github.com/ifzhang/ByteTrack),  [OC-SORT](https://github.com/noahcao/OC_SORT) and [MixFormer](https://github.com/MCG-NJU/MixFormer). Thanks their wonderful works.
+
+
+
+python3 tools/track_mixsort.py -expn expn001 -f exps/example/mot/yolox_x_sportsmot.py -c /media/disk_4t/zrt/mot/yolox_x_sports_train.pth.tar -b 1 -d 1 --config track

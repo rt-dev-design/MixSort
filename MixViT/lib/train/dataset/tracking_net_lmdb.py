@@ -101,7 +101,7 @@ class TrackingNet_lmdb(BaseVideoDataset):
         gt_str_list = decode_str(os.path.join(self.root, "TRAIN_%d_lmdb" % set_id),
                                  os.path.join("anno", vid_name + ".txt")).split('\n')[:-1]
         gt_list = [list(map(float, line.split(','))) for line in gt_str_list]
-        gt_arr = np.array(gt_list).astype(np.float32)
+        gt_arr = np.array(gt_list).astype(np.float64)
         return torch.tensor(gt_arr)
 
     def get_sequence_info(self, seq_id):

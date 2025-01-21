@@ -238,7 +238,7 @@ class ToGrayscale(TransformBase):
     def __init__(self, probability = 0.5):
         super().__init__()
         self.probability = probability
-        self.color_weights = np.array([0.2989, 0.5870, 0.1140], dtype=np.float32)
+        self.color_weights = np.array([0.2989, 0.5870, 0.1140], dtype=np.float64)
 
     def roll(self):
         return random.random() < self.probability

@@ -56,7 +56,7 @@ class PreprocessorX_onnx(object):
         img_arr_4d = (img_arr_4d / 255.0 - self.mean) / self.std  # (1, 3, H, W)
         # Deal with the attention mask
         amask_arr_3d = amask_arr[np.newaxis, :, :]  # (1,H,W)
-        return img_arr_4d.astype(np.float32), amask_arr_3d.astype(np.bool)
+        return img_arr_4d.astype(np.float64), amask_arr_3d.astype(np.bool)
 
 def vis_attn_maps(attn_weights, q_w, k_w, skip_len, x1, x2, x1_title, x2_title, save_path='.', idxs=None):
     if not os.path.exists(save_path):

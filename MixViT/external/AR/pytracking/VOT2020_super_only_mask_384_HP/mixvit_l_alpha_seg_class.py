@@ -35,7 +35,7 @@ class MIXFORMER_ALPHA_SEG(object):
         self.tracker.initialize(image, init_info)
 
         self.H, self.W, _ = image.shape
-        gt_bbox_np = np.array(region).astype(np.float32)
+        gt_bbox_np = np.array(region).astype(np.float64)
         '''Initialize STARK for specific video'''
         init_info = {'init_bbox': list(gt_bbox_np)}
         self.tracker.initialize(image, init_info)

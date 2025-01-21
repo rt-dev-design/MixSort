@@ -64,7 +64,7 @@ if __name__ == '__main__':
             print('{}: {} images'.format(seq, num_images))
 
             if split != 'test':
-                anns = np.loadtxt(ann_path, dtype=np.float32, delimiter=',')
+                anns = np.loadtxt(ann_path, dtype=np.float64, delimiter=',')
                 for i in range(anns.shape[0]):
                     frame_id = int(anns[i][0])
                     track_id = int(anns[i][1])

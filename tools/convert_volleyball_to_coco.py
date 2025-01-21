@@ -1,6 +1,7 @@
 """
 https://github.com/xingyizhou/CenterTrack
 Modified by Xiaoyu Zhao
+https://github.com/MCG-NJU/SportsMOT/blob/main/codes/conversion/mot_to_coco.py
 
 https://github.com/xingyizhou/CenterTrack/blob/master/src/tools/convert_mot_to_coco.py
 
@@ -14,19 +15,17 @@ import json
 import cv2
 from tqdm import tqdm
 
-# Use the same script for SportsMOT
-
-DATA_PATH = "datasets/SoccerNet"
+DATA_PATH = "datasets/volleyball"
 OUT_PATH = os.path.join(DATA_PATH, "annotations")
-os.makedirs(OUT_PATH)
-SPLITS = ["train", "test", "challenge"]
+os.makedirs(OUT_PATH, exist_ok=True)
+SPLITS = [str(i) for i in range(55)]
 HALF_VIDEO = False
 CREATE_SPLITTED_ANN = True
 USE_DET = False
 CREATE_SPLITTED_DET = False
 
 for split in SPLITS:
-    data_path = os.path.join(DATA_PATH, split)
+    data_path = os.path.join(DATA_PATH, "videos", split)
     out_path = os.path.join(OUT_PATH, "{}.json".format(split))
     out = {
         "images": [],
@@ -37,7 +36,7 @@ for split in SPLITS:
             "name": "pedestrian"
         }]
     }
-    video_list = os.listdir(data_path)
+    video_list = [os.path.split(os.path.split(f.path)[-2])[-1] + "/" + os.path.split(f.path)[-1] for f in os.scandir(data_path) if f.is_dir()]
     image_cnt = 0
     ann_cnt = 0
     video_cnt = 0
@@ -45,10 +44,10 @@ for split in SPLITS:
         if ".DS_Store" in seq:
             continue
         video_cnt += 1  # video sequence number.
-        out["videos"].append({"id": video_cnt, "file_name": seq})
-        seq_path = os.path.join(data_path, seq)
-        img_path = os.path.join(seq_path, "img1")
-        ann_path = os.path.join(seq_path, "gt/gt.txt")
+        out["videos"].append({"id": seq, "file_name": seq})
+        seq_path = os.path.join(data_path, os.path.split(seq)[-1])
+        img_path = os.path.join(seq_path)
+        # ann_path = os.path.join(seq_path, "gt/gt.txt")
         images = os.listdir(img_path)
         num_images = len([image for image in images
                           if "jpg" in image])  # half and half
@@ -60,7 +59,6 @@ for split in SPLITS:
                     width = int(line.split('=')[1])
                 elif 'imHeight' in line:
                     height = int(line.split('=')[1])
-
 
         if HALF_VIDEO and ("half" in split):
             image_range = [0, num_images // 2] if "train" in split else \
@@ -86,13 +84,13 @@ for split in SPLITS:
                 i if i > 0 else -1,  # image number in the entire training set.
                 "next_image_id":
                 image_cnt + i + 2 if i < num_images - 1 else -1,
-                "video_id": video_cnt,
+                "video_id": seq,
                 "height": height,
                 "width": width
             }
             out["images"].append(image_info)
         print("{}: {} images".format(seq, num_images))
-        if split != "challenge":
+        if split != "test":
             det_path = os.path.join(seq_path, "det/det.txt")
             anns = np.loadtxt(ann_path, dtype=np.float64, delimiter=",")
             if USE_DET:

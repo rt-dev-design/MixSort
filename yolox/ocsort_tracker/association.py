@@ -206,7 +206,7 @@ def associate_detections_to_trackers(detections,trackers,iou_threshold = 0.3):
     iou_matrix = iou_batch(detections, trackers)
 
     if min(iou_matrix.shape) > 0:
-        a = (iou_matrix > iou_threshold).astype(np.int32)
+        a = (iou_matrix > iou_threshold).astype(np.int64)
         if a.sum(1).max() == 1 and a.sum(0).max() == 1:
             matched_indices = np.stack(np.where(a), axis=1)
         else:
@@ -265,7 +265,7 @@ def associate(detections, trackers, iou_threshold, velocities, previous_obs, vdc
     angle_diff_cost = angle_diff_cost * scores
 
     if min(iou_matrix.shape) > 0:
-        a = (iou_matrix > iou_threshold).astype(np.int32)
+        a = (iou_matrix > iou_threshold).astype(np.int64)
         if a.sum(1).max() == 1 and a.sum(0).max() == 1: # trivial condition: no overlap, direct association
             matched_indices = np.stack(np.where(a), axis=1) # non-zero elements
         else:
@@ -345,7 +345,7 @@ def associate_kitti(detections, trackers, det_cates, iou_threshold,
     cost_matrix = - iou_matrix -angle_diff_cost - cate_matrix
 
     if min(iou_matrix.shape) > 0:
-        a = (iou_matrix > iou_threshold).astype(np.int32)
+        a = (iou_matrix > iou_threshold).astype(np.int64)
         if a.sum(1).max() == 1 and a.sum(0).max() == 1:
             matched_indices = np.stack(np.where(a), axis=1)
         else:

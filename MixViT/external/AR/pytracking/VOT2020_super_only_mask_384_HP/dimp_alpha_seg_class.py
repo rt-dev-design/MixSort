@@ -41,7 +41,7 @@ class DIMP_ALPHA(object):
     def initialize(self, img_RGB, mask):
         region = rect_from_mask(mask)
         self.H, self.W, _ = img_RGB.shape
-        gt_bbox_np = np.array(region).astype(np.float32)
+        gt_bbox_np = np.array(region).astype(np.float64)
         '''Initialize dimp for specific video'''
         gt_bbox_torch = torch.from_numpy(gt_bbox_np)
         init_info = {}
@@ -61,8 +61,8 @@ class DIMP_ALPHA(object):
         x1, y1, x2, y2 = bbox_clip(x1, y1, x1 + w, y1 + h, (self.H, self.W))
         w = x2 - x1
         h = y2 - y1
-        new_pos = torch.from_numpy(np.array([y1 + h / 2, x1 + w / 2]).astype(np.float32))
-        new_target_sz = torch.from_numpy(np.array([h, w]).astype(np.float32))
+        new_pos = torch.from_numpy(np.array([y1 + h / 2, x1 + w / 2]).astype(np.float64))
+        new_target_sz = torch.from_numpy(np.array([h, w]).astype(np.float64))
         new_scale = torch.sqrt(new_target_sz.prod() / self.dimp.base_target_sz.prod())
         ##### update
         self.dimp.pos = new_pos.clone()
@@ -133,7 +133,7 @@ def run_vot_exp(tracker_name, para_name, refine_model_name, threshold, VIS=False
             save_path = os.path.join(save_dir, search_name)
             cv2.imwrite(save_path, search_bgr)
             # search region mask
-            search_bgr_m = search_bgr.astype(np.float32)
+            search_bgr_m = search_bgr.astype(np.float64)
             search_bgr_m[:, :, 1] += 127.0 * search_m
             search_bgr_m[:, :, 2] += 127.0 * search_m
             contours, _ = cv2.findContours(search_m, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -143,7 +143,7 @@ def run_vot_exp(tracker_name, para_name, refine_model_name, threshold, VIS=False
             save_path = os.path.join(save_dir, search_name_m)
             cv2.imwrite(save_path, search_bgr_m)
             # original image + mask
-            image_m = image_ori.copy().astype(np.float32)
+            image_m = image_ori.copy().astype(np.float64)
             image_m[:, :, 1] += 127.0 * m
             image_m[:, :, 2] += 127.0 * m
             contours, _ = cv2.findContours(m, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)

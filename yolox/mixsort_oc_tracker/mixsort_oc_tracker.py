@@ -208,7 +208,7 @@ class MIXTracker(object):
         result=[]
         for i, (x1,y1,x2,y2) in enumerate(bbox):
             w,h=x2-x1,y2-y1
-            temp=np.ones((h,w),dtype=np.int8)
+            temp=np.ones((h,w),dtype=np.int648)
             for j, (_x1,_y1,_x2,_y2) in enumerate(bbox):
                 if i==j:
                     continue
@@ -248,7 +248,7 @@ class MIXTracker(object):
             bboxes /= scale
 
         # compute all ious
-        max_iou = np.expand_dims(self.uncovered_area(bboxes.astype(np.int32)), axis=-1)
+        max_iou = np.expand_dims(self.uncovered_area(bboxes.astype(np.int64)), axis=-1)
 
         dets = np.concatenate((bboxes, np.expand_dims(scores, axis=-1),max_iou), axis=1)
         inds_low = scores > 0.1

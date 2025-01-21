@@ -27,7 +27,7 @@ def xyxy_to_xywh(xyxy):
 
 def polys_to_boxes(polys):
     """Convert a list of polygons into an array of tight bounding boxes."""
-    boxes_from_polys = np.zeros((len(polys), 4), dtype=np.float32)
+    boxes_from_polys = np.zeros((len(polys), 4), dtype=np.float64)
     for i in range(len(polys)):
         poly = polys[i]
         x0 = min(min(p[::2]) for p in poly)
@@ -140,7 +140,7 @@ class Youtube_VOS(BaseDataset):
         mask_ins = (mask_img == frame['id']).astype(np.uint8)
         '''返回一个元组,第一个元素是RGB格式的图像,第二个元素是单通道的mask(只有0,1两种取值,但是是uint8类型)'''
 
-        bbox_arry = np.array(frame["bbox"]).astype(np.float32)
+        bbox_arry = np.array(frame["bbox"]).astype(np.float64)
         # bbox = torch.from_numpy(bbox_arry)
         # valid = (bbox[2] > 0) & (bbox[3] > 0)
         # visible = valid.clone().byte()

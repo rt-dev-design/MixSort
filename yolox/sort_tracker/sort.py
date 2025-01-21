@@ -151,7 +151,7 @@ def associate_detections_to_trackers(detections,trackers,iou_threshold = 0.3):
   iou_matrix = iou_batch(detections, trackers)
 
   if min(iou_matrix.shape) > 0:
-    a = (iou_matrix > iou_threshold).astype(np.int32)
+    a = (iou_matrix > iou_threshold).astype(np.int64)
     if a.sum(1).max() == 1 and a.sum(0).max() == 1:
         matched_indices = np.stack(np.where(a), axis=1)
     else:

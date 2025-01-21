@@ -29,7 +29,7 @@ class STrack(BaseTrack):
     def __init__(self, tlwh, score, iou):
 
         # wait activate
-        self._tlwh = np.asarray(tlwh, dtype=np.float)
+        self._tlwh = np.asarray(tlwh, dtype=np.float64)
         self.kalman_filter = None
         self.mean, self.covariance = None, None
         self.is_activated = False
@@ -259,7 +259,7 @@ class MIXTracker(object):
             Union[Tuple[torch.Tensor,torch.Tensor],torch.Tensor]: transfromed image (and boxes)
         """
         # compute params
-        center = torch.from_numpy(center.astype(np.int))
+        center = torch.from_numpy(center.astype(np.int64))
         search_area_factor = self.settings.search_area_factor[s]
         output_sz = self.settings.output_sz[s]
         x, y, w, h = [int(i) for i in center]
@@ -318,7 +318,7 @@ class MIXTracker(object):
 
         # for every strack, compute its vit-dist with dets
         search_bbox = torch.stack(
-            [torch.from_numpy(det.tlwh.astype(np.int)) for det in dets]
+            [torch.from_numpy(det.tlwh.astype(np.int64)) for det in dets]
         )
         search_imgs = []
         search_boxes = []

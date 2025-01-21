@@ -94,7 +94,7 @@ class Lasot_lmdb(BaseVideoDataset):
         bb_anno_file = os.path.join(seq_path, "groundtruth.txt")
         gt_str_list = decode_str(self.root, bb_anno_file).split('\n')[:-1]  # the last line is empty
         gt_list = [list(map(float, line.split(','))) for line in gt_str_list]
-        gt_arr = np.array(gt_list).astype(np.float32)
+        gt_arr = np.array(gt_list).astype(np.float64)
         return torch.tensor(gt_arr)
 
     def _read_target_visible(self, seq_path):

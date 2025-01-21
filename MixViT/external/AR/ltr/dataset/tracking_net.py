@@ -104,7 +104,7 @@ class TrackingNet(BaseVideoDataset):
         set_id = self.sequence_list[seq_id][0]
         vid_name = self.sequence_list[seq_id][1]
         bb_anno_file = os.path.join(self.root, "TRAIN_" + str(set_id), "anno", vid_name + ".txt")
-        gt = pandas.read_csv(bb_anno_file, delimiter=',', header=None, dtype=np.float32, na_filter=False,
+        gt = pandas.read_csv(bb_anno_file, delimiter=',', header=None, dtype=np.float64, na_filter=False,
                              low_memory=False).values
         return torch.tensor(gt)
 

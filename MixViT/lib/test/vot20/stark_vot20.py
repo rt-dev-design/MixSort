@@ -90,7 +90,7 @@ def run_vot_exp(tracker_name, para_name, vis=False):
             save_path = os.path.join(save_dir, image_b_name)
             cv2.imwrite(save_path, image_b)
             # original image + mask
-            image_m = image_ori.copy().astype(np.float32)
+            image_m = image_ori.copy().astype(np.float64)
             image_m[:, :, 1] += 127.0 * m
             image_m[:, :, 2] += 127.0 * m
             contours, _ = cv2.findContours(m, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
