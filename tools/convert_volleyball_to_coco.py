@@ -41,10 +41,12 @@ for split in SPLITS:
     video_list = [os.path.split(os.path.split(f.path)[-2])[-1] + "/" + os.path.split(f.path)[-1] for f in os.scandir(data_path) if f.is_dir()]
     image_cnt = 0
     ann_cnt = 0
+    video_cnt = 0
     for seq in tqdm(sorted(video_list)):
         if ".DS_Store" in seq:
             continue
-        out["videos"].append({"id": seq, "file_name": seq})
+        video_cnt += 1
+        out["videos"].append({"id": video_cnt, "file_name": seq})
         seq_path = os.path.join(data_path, os.path.split(seq)[-1])
         img_path = os.path.join(seq_path)
         # ann_path = os.path.join(seq_path, "gt/gt.txt")
@@ -61,12 +63,8 @@ for split in SPLITS:
         for i in range(num_images):
             if i < image_range[0] or i > image_range[1]:
                 continue
-            # img = cv2.imread(
-            #     os.path.join(data_path,
-            #                  "{}/img1/{:06d}.jpg".format(seq, i + 1)))
-            # height, width = img.shape[:2]
             image_info = {
-                "file_name": "{}/img1/{:06d}.jpg".format(seq,
+                "file_name": "{}/{:06d}.jpg".format(seq,
                                                          i + 1),  # image name.
                 "id":
                 image_cnt + i + 1,  # image number in the entire training set.
@@ -76,13 +74,12 @@ for split in SPLITS:
                 i if i > 0 else -1,  # image number in the entire training set.
                 "next_image_id":
                 image_cnt + i + 2 if i < num_images - 1 else -1,
-                "video_id": seq,
+                "video_id": video_cnt,
                 "height": HEIGHT,
                 "width": WIDTH
             }
             out["images"].append(image_info)
         print("{}: {} images".format(seq, num_images))
-        
         image_cnt += num_images
     print("loaded {} for {} images and {} samples".format(
         split, len(out["images"]), len(out["annotations"])))
