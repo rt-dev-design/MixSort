@@ -23,6 +23,8 @@ HALF_VIDEO = False
 CREATE_SPLITTED_ANN = True
 USE_DET = False
 CREATE_SPLITTED_DET = False
+WIDTH = 1280
+HEIGHT = 720
 
 for split in SPLITS:
     data_path = os.path.join(DATA_PATH, "videos", split)
@@ -46,7 +48,7 @@ for split in SPLITS:
         seq_path = os.path.join(data_path, os.path.split(seq)[-1])
         img_path = os.path.join(seq_path)
         # ann_path = os.path.join(seq_path, "gt/gt.txt")
-        images = os.listdir(img_path)
+        images = sorted(os.listdir(img_path))
         num_images = len([image for image in images
                           if "jpg" in image])  # half and half
 
@@ -75,83 +77,12 @@ for split in SPLITS:
                 "next_image_id":
                 image_cnt + i + 2 if i < num_images - 1 else -1,
                 "video_id": seq,
-                "height": height,
-                "width": width
+                "height": HEIGHT,
+                "width": WIDTH
             }
             out["images"].append(image_info)
         print("{}: {} images".format(seq, num_images))
-        if split != "test":
-            det_path = os.path.join(seq_path, "det/det.txt")
-            anns = np.loadtxt(ann_path, dtype=np.float64, delimiter=",")
-            if USE_DET:
-                dets = np.loadtxt(det_path, dtype=np.float64, delimiter=",")
-            if CREATE_SPLITTED_ANN and ("half" in split):
-                anns_out = np.array([
-                    anns[i] for i in range(anns.shape[0])
-                    if int(anns[i][0]) - 1 >= image_range[0]
-                    and int(anns[i][0]) - 1 <= image_range[1]
-                ], np.float64)
-                anns_out[:, 0] -= image_range[0]
-                gt_out = os.path.join(seq_path, "gt/gt_{}.txt".format(split))
-                fout = open(gt_out, "w")
-                for o in anns_out:
-                    fout.write(
-                        "{:d},{:d},{:d},{:d},{:d},{:d},{:d},{:d},{:.6f}\n".
-                        format(int(o[0]), int(o[1]), int(o[2]), int(o[3]),
-                               int(o[4]), int(o[5]), int(o[6]), int(o[7]),
-                               o[8]))
-                fout.close()
-            if CREATE_SPLITTED_DET and ("half" in split) and USE_DET:
-                dets_out = np.array([
-                    dets[i] for i in range(dets.shape[0])
-                    if int(dets[i][0]) - 1 >= image_range[0]
-                    and int(dets[i][0]) - 1 <= image_range[1]
-                ], np.float64)
-                dets_out[:, 0] -= image_range[0]
-                det_out = os.path.join(seq_path,
-                                       "det/det_{}.txt".format(split))
-                dout = open(det_out, "w")
-                for o in dets_out:
-                    dout.write(
-                        "{:d},{:d},{:.1f},{:.1f},{:.1f},{:.1f},{:.6f}\n".
-                        format(int(o[0]), int(o[1]), float(o[2]), float(o[3]),
-                               float(o[4]), float(o[5]), float(o[6])))
-                dout.close()
-
-            print("{} ann images".format(int(anns[:, 0].max())))
-            for i in range(anns.shape[0]):
-                frame_id = int(anns[i][0])
-                if frame_id - 1 < image_range[0] or frame_id - 1 > image_range[
-                        1]:
-                    continue
-                track_id = int(anns[i][1])
-                cat_id = int(anns[i][7])
-                ann_cnt += 1
-                if not ("15" in DATA_PATH):
-                    if not (float(anns[i][8]) >= 0.25):  # visibility.
-                        continue
-                    if not (int(anns[i][6]) == 1):  # whether ignore.
-                        continue
-                    if int(anns[i][7]) in [3, 4, 5, 6, 9, 10,
-                                           11]:  # Non-person
-                        continue
-                    if int(anns[i][7]) in [2, 7, 8, 12]:  # Ignored person
-                        category_id = -1
-                    else:
-                        category_id = 1  # pedestrian(non-static)
-                else:
-                    category_id = 1
-                ann = {
-                    "id": ann_cnt,
-                    "category_id": category_id,
-                    "image_id": image_cnt + frame_id,
-                    "track_id": track_id,
-                    "bbox": anns[i][2:6].tolist(),
-                    "conf": float(anns[i][6]),
-                    "iscrowd": 0,
-                    "area": float(anns[i][4] * anns[i][5])
-                }
-                out["annotations"].append(ann)
+        
         image_cnt += num_images
     print("loaded {} for {} images and {} samples".format(
         split, len(out["images"]), len(out["annotations"])))
