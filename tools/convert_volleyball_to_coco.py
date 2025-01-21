@@ -18,7 +18,7 @@ from tqdm import tqdm
 DATA_PATH = "datasets/volleyball"
 OUT_PATH = os.path.join(DATA_PATH, "annotations")
 os.makedirs(OUT_PATH, exist_ok=True)
-SPLITS = [str(i) for i in range(55)]
+SPLITS = [str(i) for i in range(55)]  # A "split" stands for a video made up of sequences in Volleyball
 HALF_VIDEO = False
 CREATE_SPLITTED_ANN = True
 USE_DET = False
@@ -26,30 +26,30 @@ CREATE_SPLITTED_DET = False
 WIDTH = 1280
 HEIGHT = 720
 
+out_path = os.path.join(OUT_PATH, "val.json")
+out = {
+    "images": [],
+    "annotations": [],
+    "videos": [],
+    "categories": [{
+        "id": 1,
+        "name": "pedestrian"
+    }]
+}
+image_cnt = 0
+video_cnt = 0
+
 for split in SPLITS:
     data_path = os.path.join(DATA_PATH, "videos", split)
-    out_path = os.path.join(OUT_PATH, "{}.json".format(split))
-    out = {
-        "images": [],
-        "annotations": [],
-        "videos": [],
-        "categories": [{
-            "id": 1,
-            "name": "pedestrian"
-        }]
-    }
-    video_list = [os.path.split(os.path.split(f.path)[-2])[-1] + "/" + os.path.split(f.path)[-1] for f in os.scandir(data_path) if f.is_dir()]
-    image_cnt = 0
-    ann_cnt = 0
-    video_cnt = 0
-    for seq in tqdm(sorted(video_list)):
+    video_list = sorted([int(os.path.split(f.path)[-1]) for f in os.scandir(data_path) if f.is_dir()])
+    video_list = [os.path.split(data_path)[-1] + "/" + str(v) for v in video_list]
+    for seq in tqdm(video_list, total=len(video_list), desc="video {}".format(split)):
         if ".DS_Store" in seq:
             continue
         video_cnt += 1
         out["videos"].append({"id": video_cnt, "file_name": seq})
         seq_path = os.path.join(data_path, os.path.split(seq)[-1])
         img_path = os.path.join(seq_path)
-        # ann_path = os.path.join(seq_path, "gt/gt.txt")
         images = sorted(os.listdir(img_path))
         num_images = len([image for image in images
                           if "jpg" in image])  # half and half
@@ -64,16 +64,11 @@ for split in SPLITS:
             if i < image_range[0] or i > image_range[1]:
                 continue
             image_info = {
-                "file_name": "{}/{:06d}.jpg".format(seq,
-                                                         i + 1),  # image name.
-                "id":
-                image_cnt + i + 1,  # image number in the entire training set.
-                "frame_id": i + 1 - image_range[
-                    0],  # image number in the video sequence, starting from 1.
-                "prev_image_id": image_cnt +
-                i if i > 0 else -1,  # image number in the entire training set.
-                "next_image_id":
-                image_cnt + i + 2 if i < num_images - 1 else -1,
+                "file_name": "{}/{}".format(seq, images[i]),  # image name.
+                "id": image_cnt + i + 1,  # image number in the entire training set.
+                "frame_id": i + 1 - image_range[0],  # image number in the video sequence, starting from 1.
+                "prev_image_id": image_cnt + i if i > 0 else -1,  # image number in the entire training set.
+                "next_image_id": image_cnt + i + 2 if i < num_images - 1 else -1,
                 "video_id": video_cnt,
                 "height": HEIGHT,
                 "width": WIDTH
@@ -83,5 +78,6 @@ for split in SPLITS:
         image_cnt += num_images
     print("loaded {} for {} images and {} samples".format(
         split, len(out["images"]), len(out["annotations"])))
-    with open(out_path, "w") as f:
-        json.dump(out, f, indent=2)
+
+with open(out_path, "w") as f:
+    json.dump(out, f, indent=2)
