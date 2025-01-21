@@ -49,14 +49,6 @@ for split in SPLITS:
         images = os.listdir(img_path)
         num_images = len([image for image in images
                           if "jpg" in image])  # half and half
-        
-        info_path = os.path.join(seq_path, "seqinfo.ini")
-        with open(info_path, "r") as f:
-            for line in f:
-                if 'imWidth' in line:
-                    width = int(line.split('=')[1])
-                elif 'imHeight' in line:
-                    height = int(line.split('=')[1])
 
         if HALF_VIDEO and ("half" in split):
             image_range = [0, num_images // 2] if "train" in split else \
