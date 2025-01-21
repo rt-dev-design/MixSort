@@ -39,11 +39,9 @@ for split in SPLITS:
     video_list = [os.path.split(os.path.split(f.path)[-2])[-1] + "/" + os.path.split(f.path)[-1] for f in os.scandir(data_path) if f.is_dir()]
     image_cnt = 0
     ann_cnt = 0
-    video_cnt = 0
     for seq in tqdm(sorted(video_list)):
         if ".DS_Store" in seq:
             continue
-        video_cnt += 1  # video sequence number.
         out["videos"].append({"id": seq, "file_name": seq})
         seq_path = os.path.join(data_path, os.path.split(seq)[-1])
         img_path = os.path.join(seq_path)
