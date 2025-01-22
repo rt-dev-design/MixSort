@@ -53,7 +53,7 @@ for split in SPLITS:
         images = sorted(os.listdir(img_path))
         num_images = len([image for image in images
                           if "jpg" in image])  # half and half
-
+        assert num_images == 41, "{} has {} images".format(seq, num_images)
         if HALF_VIDEO and ("half" in split):
             image_range = [0, num_images // 2] if "train" in split else \
                             [num_images // 2 + 1, num_images - 1]
@@ -74,10 +74,8 @@ for split in SPLITS:
                 "width": WIDTH
             }
             out["images"].append(image_info)
-        print("{}: {} images".format(seq, num_images))
+        tqdm.write("clip {}: {} images".format(seq, num_images))
         image_cnt += num_images
-    print("loaded {} for {} images and {} samples".format(
-        split, len(out["images"]), len(out["annotations"])))
 
 with open(out_path, "w") as f:
     json.dump(out, f, indent=2)
