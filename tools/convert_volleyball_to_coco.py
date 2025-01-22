@@ -18,7 +18,8 @@ from tqdm import tqdm
 DATA_PATH = "datasets/volleyball"
 OUT_PATH = os.path.join(DATA_PATH, "annotations")
 os.makedirs(OUT_PATH, exist_ok=True)
-SPLITS = [str(i) for i in range(55)]  # A "split" stands for a video made up of sequences in Volleyball
+split_list = sorted([int(os.path.split(f.path)[-1]) for f in os.scandir("datasets/volleyball/videos") if f.is_dir()])
+SPLITS = [str(s) for s in split_list]
 HALF_VIDEO = False
 CREATE_SPLITTED_ANN = True
 USE_DET = False
