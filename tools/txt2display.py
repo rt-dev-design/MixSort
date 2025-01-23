@@ -101,51 +101,26 @@ def txt2display(dataset_path, selection=None):
     ignore_labels = {2, 7, 8, 12}
     color_list = colormap()
     track_results_path = os.path.join(dataset_path, "track_results")
+    videos_path = os.path.join(dataset_path, "videos")
     
     all_videos = sorted([int(clip) for clip in os.listdir(track_results_path)])
-    all_clips = []
+    tracks_of_all_clips = []
     for video in all_videos:
         to_sort = [int(file.split(".")[0]) for file in os.listdir(os.path.join(track_results_path, str(video)))]
-        clip_files = [os.path.join(track_results_path, str(video), str(f) + ".txt") for f in sorted(to_sort)]
-        all_clips.extend(clip_files)
+        track_files = [os.path.join(track_results_path, str(video), str(f) + ".txt") for f in sorted(to_sort)]
+        tracks_of_all_clips.extend(track_files)
+    
+    if selection is not None:  
+        selection = [os.path.join(track_results_path, s + ".txt") for s in selection]
         
-    selection = [os.path.join(track_results_path, s + ".txt") for s in selection]
-        
-    for show_video_name in all_clips if selection is None else selection:
-        img_dict = dict()
-        
-        if visual_path == "visual_val_gt":
-            txt_path = 'datasets/mot/train/' + show_video_name + '/gt/gt_val_half.txt'
-        elif visual_path == "visual_yolox_x":
-            txt_path = 'YOLOX_outputs/yolox_mot_x_1088/track_results/'+ show_video_name + '.txt'
-        elif visual_path == "visual_test_predict":
-            txt_path = 'test/tracks/'+ show_video_name + '.txt'
-        else:
-            raise NotImplementedError
-        
-        with open(gt_json_path, 'r') as f:
-            gt_json = json.load(f)
-
-        for ann in gt_json["images"]:
-            file_name = ann['file_name']
-            video_name = file_name.split('/')[0]
-            if video_name == show_video_name:
-                img_dict[ann['frame_id']] = img_path + file_name
-
+    for track_file in tracks_of_all_clips if selection is None else selection:
+        clip_dir = track_file[:-4].replace("track_results", "videos")
+        images = ['place holder for index 0'] + [os.path.join(clip_dir, str(image)) + ".jpg" for image in sorted([int(f[:-4]) for f in os.listdir(clip_dir)])]
 
         txt_dict = dict()    
-        with open(txt_path, 'r') as f:
+        with open(track_file, 'r') as f:
             for line in f.readlines():
                 linelist = line.split(',')
-
-                mark = int(float(linelist[6]))
-                label = int(float(linelist[7]))
-                vis_ratio = float(linelist[8])
-                
-                if visual_path == "visual_val_gt":
-                    if mark == 0 or label not in valid_labels or label in ignore_labels or vis_ratio <= 0:
-                        continue
-
                 img_id = linelist[0]
                 obj_id = linelist[1]
                 bbox = [float(linelist[2]), float(linelist[3]), 
@@ -156,16 +131,17 @@ def txt2display(dataset_path, selection=None):
                 else:
                     txt_dict[int(img_id)] = list()
                     txt_dict[int(img_id)].append(bbox)
-
         for img_id in sorted(txt_dict.keys()):
-            img = cv2.imread(img_dict[img_id])
+            img = cv2.imread(images[img_id])
             for bbox in txt_dict[img_id]:
                 cv2.rectangle(img, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), color_list[bbox[4]%79].tolist(), thickness=2)
                 cv2.putText(img, "{}".format(int(bbox[4])), (int(bbox[0]), int(bbox[1])), cv2.FONT_HERSHEY_SIMPLEX, 0.8, color_list[bbox[4]%79].tolist(), 2)
-            cv2.imwrite(visual_path + "/" + show_video_name + "{:0>6d}.png".format(img_id), img)
-        print(show_video_name, "Done")
-    print("txt2img Done")
+            cv2.imshow(images[img_id], img)
+            cv2.waitKey(0)
+            # cv2.destroyAllWindows()
+        print("Done visualizing", track_file)
+    print("txt2display Done")
 
 
 if __name__ == '__main__':
-    txt2display(dataset_path="YOLOX_outputs/expn003-volleyball")
+    txt2display(dataset_path="datasets/volleyball")
