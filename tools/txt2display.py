@@ -4,6 +4,7 @@ import json
 import cv2
 import glob as gb
 import numpy as np
+import tkinter as tk
 
 def colormap(rgb=False):
     color_list = np.array(
@@ -97,11 +98,8 @@ def colormap(rgb=False):
 
 def txt2display(dataset_path, selection=None):
     print("Starting txt2display")
-    valid_labels = {1}
-    ignore_labels = {2, 7, 8, 12}
     color_list = colormap()
     track_results_path = os.path.join(dataset_path, "track_results")
-    videos_path = os.path.join(dataset_path, "videos")
     
     all_videos = sorted([int(clip) for clip in os.listdir(track_results_path)])
     tracks_of_all_clips = []
@@ -131,17 +129,32 @@ def txt2display(dataset_path, selection=None):
                 else:
                     txt_dict[int(img_id)] = list()
                     txt_dict[int(img_id)].append(bbox)
+        # 获取屏幕的宽度和高度
+        screen_width = tk.Tk().winfo_screenwidth()
+        screen_height = tk.Tk().winfo_screenheight()
+
+
         for img_id in sorted(txt_dict.keys()):
             img = cv2.imread(images[img_id])
             for bbox in txt_dict[img_id]:
                 cv2.rectangle(img, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), color_list[bbox[4]%79].tolist(), thickness=2)
                 cv2.putText(img, "{}".format(int(bbox[4])), (int(bbox[0]), int(bbox[1])), cv2.FONT_HERSHEY_SIMPLEX, 0.8, color_list[bbox[4]%79].tolist(), 2)
-            cv2.imshow(images[img_id], img)
+            
+            # 计算窗口的左上角坐标使其居中
+            x_pos = int((screen_width - img.shape[1]) / 2)
+            y_pos = int((screen_height - img.shape[0]) / 2)
+            window_name = images[img_id]
+            cv2.namedWindow(window_name, cv2.WINDOW_AUTOSIZE) 
+            cv2.setWindowTitle(window_name, window_name)
+            cv2.moveWindow(window_name, x_pos, y_pos)
+            cv2.imshow(window_name, img)
             cv2.waitKey(0)
             # cv2.destroyAllWindows()
         print("Done visualizing", track_file)
+        cv2.destroyAllWindows()
     print("txt2display Done")
 
 
 if __name__ == '__main__':
-    txt2display(dataset_path="datasets/volleyball")
+    selection = ['0/7917', '1/9930']
+    txt2display(dataset_path="/media/disk_4t/zrt/gar/volleyball_examples", selection=selection)
