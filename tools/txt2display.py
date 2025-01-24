@@ -1,8 +1,6 @@
 import os
 import sys
-import json
 import cv2
-import glob as gb
 import numpy as np
 import tkinter as tk
 
@@ -113,8 +111,13 @@ def txt2display(dataset_path, selection=None):
         
     for track_file in tracks_of_all_clips if selection is None else selection:
         clip_dir = track_file[:-4].replace("track_results", "videos")
-        images = ['place holder for index 0'] + [os.path.join(clip_dir, str(image)) + ".jpg" for image in sorted([int(f[:-4]) for f in os.listdir(clip_dir)])]
-
+        if "volleyball" in dataset_path:
+            images = ['place holder for index 0'] + [os.path.join(clip_dir, str(image)) + ".jpg" for image in sorted([int(f[:-4]) for f in os.listdir(clip_dir)])]
+        elif "nba" in dataset_path:
+            images = ['place holder for index 0'] + [os.path.join(clip_dir, img) for img in sorted([f for f in os.listdir(clip_dir)])]
+        else:
+            assert False, "This script assumes the dataset is either 'volleyball' or 'nba'"
+        
         txt_dict = dict()    
         with open(track_file, 'r') as f:
             for line in f.readlines():
@@ -156,5 +159,6 @@ def txt2display(dataset_path, selection=None):
 
 
 if __name__ == '__main__':
-    selection = ['0/7917', '1/9930']
-    txt2display(dataset_path="/media/disk_4t/zrt/gar/volleyball_examples", selection=None)
+    dataset_path = "/media/disk_4t/zrt/gar/nba_examples"
+    selection = ['21800909/366', '21800919/389']  # None, which indicates visualizing all, or a list with the form like ['0/7917', '1/9930']
+    txt2display(dataset_path=dataset_path, selection=selection)

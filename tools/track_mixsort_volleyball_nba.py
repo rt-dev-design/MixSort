@@ -1,5 +1,4 @@
 from loguru import logger
-
 import torch
 import torch.backends.cudnn as cudnn
 from torch.nn.parallel import DistributedDataParallel as DDP
@@ -9,34 +8,19 @@ from yolox.core import launch
 from yolox.exp import get_exp
 from yolox.utils import configure_nccl, fuse_model, get_local_rank, get_model_info, setup_logger
 from yolox.evaluators import MOTEvaluator
-
 import argparse
 import random
 import warnings
-import glob
 import motmetrics as mm
-from collections import OrderedDict
-from pathlib import Path
-
 from yolox.utils import (
     gather,
     is_main_process,
     postprocess,
     synchronize,
-    time_synchronized,
-    xyxy2xywh
+    time_synchronized
 )
-from yolox.sort_tracker.sort import Sort
-from yolox.deepsort_tracker.deepsort import DeepSort
-from yolox.motdt_tracker.motdt_tracker import OnlineTracker
-
-
-import contextlib
-import io
 import os
 import itertools
-import json
-import tempfile
 import time
 from collections import defaultdict
 from loguru import logger
@@ -54,9 +38,9 @@ def write_results(filename, results):
                 f.write(line)
     logger.info('save results to {}'.format(filename))
 
-class VolleyballMotEvaluator(MOTEvaluator):
+class VolleyballNbaMotEvaluator(MOTEvaluator):
     def __init__(self, args, dataloader, img_size, confthre, nmsthre, num_classes):
-        super(VolleyballMotEvaluator, self).__init__(
+        super(VolleyballNbaMotEvaluator, self).__init__(
             dataloader=dataloader,
             img_size=img_size,
             confthre=confthre,
@@ -396,7 +380,7 @@ def main(exp, args, num_gpu):
     #logger.info("Model Structure:\n{}".format(str(model)))
 
     val_loader = exp.get_eval_loader(args.batch_size, is_distributed, args.test, return_origin_img=True)
-    evaluator = VolleyballMotEvaluator(
+    evaluator = VolleyballNbaMotEvaluator(
         args=args,
         dataloader=val_loader,
         img_size=exp.test_size,
