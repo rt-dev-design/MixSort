@@ -10,20 +10,19 @@ There are extra many convert_X_to_coco.py
 https://cocodataset.org/#format-data
 """
 import os
-import numpy as np
 import json
-import cv2
 from tqdm import tqdm
+import sys
 
-DATA_PATH = "datasets/nba"
+assert len(sys.argv) == 2, "Usage: python convert_dataset_to_coco.py [volleyball | nba]"
+dataset_name = sys.argv[1]
+assert dataset_name in ["volleyball", "nba"], "only support [volleyball | nba]"
+
+DATA_PATH = f"datasets/{dataset_name}"
 OUT_PATH = os.path.join(DATA_PATH, "annotations")
 os.makedirs(OUT_PATH, exist_ok=True)
-split_list = sorted([int(os.path.split(f.path)[-1]) for f in os.scandir("datasets/nba/videos") if f.is_dir()])
-SPLITS = [str(s) for s in split_list]
-HALF_VIDEO = False
-CREATE_SPLITTED_ANN = True
-USE_DET = False
-CREATE_SPLITTED_DET = False
+
+video_set_list = [str(s) for s in sorted([int(os.path.split(f.path)[-1]) for f in os.scandir(f"datasets/{dataset_name}/videos") if f.is_dir()])]
 WIDTH = 1280
 HEIGHT = 720
 
@@ -40,11 +39,11 @@ out = {
 image_cnt = 0
 video_cnt = 0
 
-for split in SPLITS:
-    data_path = os.path.join(DATA_PATH, "videos", split)
+for video_set in video_set_list:
+    data_path = os.path.join(DATA_PATH, "videos", video_set)
     video_list = sorted([int(os.path.split(f.path)[-1]) for f in os.scandir(data_path) if f.is_dir()])
     video_list = [os.path.split(data_path)[-1] + "/" + str(v) for v in video_list]
-    for seq in tqdm(video_list, total=len(video_list), desc="video {}".format(split)):
+    for seq in tqdm(video_list, total=len(video_list), desc="video {}".format(video_set)):
         if ".DS_Store" in seq:
             continue
         video_cnt += 1
@@ -52,14 +51,9 @@ for split in SPLITS:
         seq_path = os.path.join(data_path, os.path.split(seq)[-1])
         img_path = os.path.join(seq_path)
         images = sorted(os.listdir(img_path))
-        num_images = len([image for image in images
-                          if "jpg" in image])  # half and half
-        assert num_images == 41, "{} has {} images".format(seq, num_images)
-        if HALF_VIDEO and ("half" in split):
-            image_range = [0, num_images // 2] if "train" in split else \
-                            [num_images // 2 + 1, num_images - 1]
-        else:
-            image_range = [0, num_images - 1]
+        num_images = len([image for image in images if "jpg" in image])  # half and half
+        assert num_images == 41 if dataset_name == "volleyball" else 72, "{} has {} images, which is not right".format(seq, num_images)
+        image_range = [0, num_images - 1]
 
         for i in range(num_images):
             if i < image_range[0] or i > image_range[1]:

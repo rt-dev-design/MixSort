@@ -157,4 +157,4 @@ def txt2display(dataset_path, selection=None):
 
 if __name__ == '__main__':
     selection = ['0/7917', '1/9930']
-    txt2display(dataset_path="/media/disk_4t/zrt/gar/volleyball_examples", selection=selection)
+    txt2display(dataset_path="/media/disk_4t/zrt/gar/volleyball_examples", selection=None)
