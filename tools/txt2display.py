@@ -94,7 +94,7 @@ def colormap(rgb=False):
     return color_list
 
 
-def txt2display(dataset_path, selection=None):
+def txt2display(dataset_path, selection=None, start_from=None):
     print("Starting txt2display")
     color_list = colormap()
     track_results_path = os.path.join(dataset_path, "track_results")
@@ -108,7 +108,12 @@ def txt2display(dataset_path, selection=None):
     
     if selection is not None:  
         selection = [os.path.join(track_results_path, s + ".txt") for s in selection]
-        
+    
+    if selection is None and start_from is not None:
+        start_from_track = os.path.join(track_results_path, start_from + ".txt")
+        assert start_from_track in tracks_of_all_clips, "'start_from' is not a valid clip name"
+        tracks_of_all_clips = tracks_of_all_clips[tracks_of_all_clips.index(start_from_track):]
+
     for track_file in tracks_of_all_clips if selection is None else selection:
         clip_dir = track_file[:-4].replace("track_results", "videos")
         if "volleyball" in dataset_path:
@@ -160,5 +165,6 @@ def txt2display(dataset_path, selection=None):
 
 if __name__ == '__main__':
     dataset_path = "/media/disk_4t/zrt/gar/nba_examples"
-    selection = ['21800909/366', '21800919/389']  # None, which indicates visualizing all, or a list with the form like ['0/7917', '1/9930']
-    txt2display(dataset_path=dataset_path, selection=selection)
+    selection = None  # None, which indicates visualizing all, or a list with the form like ['0/7917', '1/9930'], ['21800909/366', '21800919/389']
+    start_from = '21800919/691'
+    txt2display(dataset_path=dataset_path, selection=selection, start_from=start_from)
