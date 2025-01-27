@@ -113,12 +113,16 @@ def txt2display(dataset_path, selection=None, start_from=None):
         start_from_track = os.path.join(track_results_path, start_from + ".txt")
         assert start_from_track in tracks_of_all_clips, "'start_from' is not a valid clip name"
         tracks_of_all_clips = tracks_of_all_clips[tracks_of_all_clips.index(start_from_track):]
+    
+    is_volleyball = "volleyball" in dataset_path
+    is_nba = "nba" in dataset_path
+    RESIZE_SCALE = (1280, 720)
 
     for track_file in tracks_of_all_clips if selection is None else selection:
         clip_dir = track_file[:-4].replace("track_results", "videos")
-        if "volleyball" in dataset_path:
+        if is_volleyball:
             images = ['place holder for index 0'] + [os.path.join(clip_dir, str(image)) + ".jpg" for image in sorted([int(f[:-4]) for f in os.listdir(clip_dir)])]
-        elif "nba" in dataset_path:
+        elif is_nba:
             images = ['place holder for index 0'] + [os.path.join(clip_dir, img) for img in sorted([f for f in os.listdir(clip_dir)])]
         else:
             assert False, "This script assumes the dataset is either 'volleyball' or 'nba'"
@@ -144,10 +148,13 @@ def txt2display(dataset_path, selection=None, start_from=None):
 
         for img_id in sorted(txt_dict.keys()):
             img = cv2.imread(images[img_id])
+            if is_nba:
+                img = cv2.resize(img, RESIZE_SCALE)
+                
             for bbox in txt_dict[img_id]:
                 cv2.rectangle(img, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), color_list[bbox[4]%79].tolist(), thickness=2)
                 cv2.putText(img, "{}".format(int(bbox[4])), (int(bbox[0]), int(bbox[1])), cv2.FONT_HERSHEY_SIMPLEX, 0.8, color_list[bbox[4]%79].tolist(), 2)
-            
+
             # 计算窗口的左上角坐标使其居中
             x_pos = int((screen_width - img.shape[1]) / 2)
             y_pos = int((screen_height - img.shape[0]) / 2)
@@ -164,7 +171,7 @@ def txt2display(dataset_path, selection=None, start_from=None):
 
 
 if __name__ == '__main__':
-    dataset_path = "/media/disk_4t/zrt/gar/nba_examples"
-    selection = None  # None, which indicates visualizing all, or a list with the form like ['0/7917', '1/9930'], ['21800909/366', '21800919/389']
-    start_from = '21800919/691'
+    dataset_path = "/media/ssd_2t/home/zrt/datasets/gar/nba"
+    selection = None # ['22/24290', '1/9930']  # None, which indicates visualizing all, or a list with the form like ['0/7917', '1/9930'], ['21800909/366', '21800919/389']
+    start_from = None # '21800919/691'  '21801078/272'  '22/24290'
     txt2display(dataset_path=dataset_path, selection=selection, start_from=start_from)

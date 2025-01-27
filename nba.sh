@@ -1,0 +1,1 @@
+CUDA_VISIBLE_DEVICES=0, python3 tools/track_mixsort_volleyball_nba.py -expn mixsort-nba-mix-full -f exps/example/mot/yolox_x_nba.py -c /media/disk_4t/zrt/mot/yolox_x_sports_mix.pth.tar -b 1 -d 1 --config track
