@@ -176,7 +176,7 @@ def txt2display(dataset_path, selection=None, start_from=None):
 
 
 if __name__ == '__main__':
-    dataset_path = "/media/ssd_2t/home/zrt/datasets/gar/nba"
+    dataset_path = "/media/ssd_2t/home/zrt/datasets/gar/volleyball"
     selection = None # ['22/24290', '1/9930']  # None, which indicates visualizing all, or a list with the form like ['0/7917', '1/9930'], ['21800909/366', '21800919/389']
     start_from = None # '21800919/691'  '21801078/272'  '22/24290'
     txt2display(dataset_path=dataset_path, selection=selection, start_from=start_from)
