@@ -118,6 +118,8 @@ def txt2display(dataset_path, selection=None, start_from=None):
     is_nba = "nba" in dataset_path
     RESIZE_SCALE = (1280, 720)
 
+    win_num = 0
+    only_visualize_the_first_frame_of_each_clip = False
     for track_file in tracks_of_all_clips if selection is None else selection:
         clip_dir = track_file[:-4].replace("track_results", "videos")
         if is_volleyball:
@@ -148,8 +150,7 @@ def txt2display(dataset_path, selection=None, start_from=None):
 
         for img_id in sorted(txt_dict.keys()):
             img = cv2.imread(images[img_id])
-            if is_nba:
-                img = cv2.resize(img, RESIZE_SCALE)
+            img = cv2.resize(img, RESIZE_SCALE)
                 
             for bbox in txt_dict[img_id]:
                 cv2.rectangle(img, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), color_list[bbox[4]%79].tolist(), thickness=2)
@@ -164,9 +165,13 @@ def txt2display(dataset_path, selection=None, start_from=None):
             cv2.moveWindow(window_name, x_pos, y_pos)
             cv2.imshow(window_name, img)
             cv2.waitKey(0)
-            # cv2.destroyAllWindows()
+            if only_visualize_the_first_frame_of_each_clip:
+                break
         print("Done visualizing", track_file)
-        cv2.destroyAllWindows()
+        win_num += 1
+        if win_num >= 100:
+            win_num = 0
+            cv2.destroyAllWindows()
     print("txt2display Done")
 
 
